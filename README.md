@@ -1,8 +1,8 @@
 # RD_FA_Delphes
 Delphes IDEA simulation
 
-Implementation of the IDEA Detector with Delphes. 
-Working folders and files:
+Implementation of the IDEA Detector with Delphes.   
+Working folders and files:  
         cards -> delphes_card_IDEAdet.tcl
         (all) Pythia8 generation files -> Delphes-3.4.1/examples/Pythia8/mypythia
         (all) Pyroot analysis -> Delphes-3.4.1/examples/myanalysis
