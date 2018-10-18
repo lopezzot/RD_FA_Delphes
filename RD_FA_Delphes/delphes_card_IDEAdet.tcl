@@ -1,16 +1,11 @@
 #######################################
 # IDEAdet model
-# For the low energy stage of
 # 
 # Authors: Elisa Fontanesi, Lorenzo Pezzotti, Massimiliano Antonello
 # email: lorenzo.pezzotti01@universitadipavia.it, 
 #        m.antonello@uninsubria.it,
 #        efontane@bo.infn.it
 #
-# Jet finding with Valencia algorithm:
-# use exclusive clustering with njets
-# according to final state
-# 
 #######################################
 # Order of execution of various modules
 #######################################
