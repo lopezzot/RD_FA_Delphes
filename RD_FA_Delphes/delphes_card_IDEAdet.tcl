@@ -1,10 +1,11 @@
-#######################################
+#####################################################################
 # IDEAdet model
 # 
 # Authors: Elisa Fontanesi, Lorenzo Pezzotti, Massimiliano Antonello
 # email: lorenzo.pezzotti01@universitadipavia.it, 
 #        m.antonello@uninsubria.it,
 #        efontane@bo.infn.it
+#####################################################################
 #
 #######################################
 # Order of execution of various modules
@@ -92,7 +93,7 @@ module Efficiency ChargedHadronTrackingEfficiency {
     # We use only one efficiency, we set only 0 effincency out of eta bounds:
 
     set EfficiencyFormula {
-    (pt <= 0.1)                                                * (0.000) +
+	(pt <= 0.1)                                            * (0.000) +
 	(abs(eta) > 2.1)                                       * (0.000) +
 	(energy >= 0.5) * (abs(eta) <= 2.1)                    * (0.995) +
 	(energy < 0.5 && energy >= 0.3) * (abs(eta) <= 2.1)    * (0.65) +
@@ -149,8 +150,8 @@ module MomentumSmearing ChargedHadronMomentumSmearing {
     # Resolution given in dpT/pT.
     # IDEAdet
     set ResolutionFormula {
-    (abs(eta) <= 0.9)                        * sqrt(0.00034^2 * pt^2 + 0.00833^2) +
-	(abs(eta) > 0.9 && abs(eta) <= 2.1 ) * sqrt(0.0034^2 * pt^2 + 0.0833^2)
+    (abs(eta) <= 0.87)                   * sqrt(0.00034^2 * pt^2 + 0.00833^2) +
+    (abs(eta) > 0.87 && abs(eta) <= 2.1) * sqrt(0.0034^2 * pt^2 + 0.0833^2)
     }
 }
 
@@ -165,8 +166,8 @@ module MomentumSmearing ElectronMomentumSmearing {
     # Resolution given in dpT/pT.
     # IDEAdet
     set ResolutionFormula {
-    (abs(eta) <= 0.9)                      * sqrt( 0.00034^2 * pt^2 + 0.00833^2) +
-	(abs(eta) > 0.9 && abs(eta) <= 2.1 )   * sqrt( 0.0034^2 * pt^2 + 0.0833^2)
+    (abs(eta) <= 0.87)                   * sqrt( 0.00034^2 * pt^2 + 0.00833^2) +
+    (abs(eta) > 0.87 && abs(eta) <= 2.1) * sqrt( 0.0034^2 * pt^2 + 0.0833^2)
     }
 }
 
@@ -181,8 +182,8 @@ module MomentumSmearing MuonMomentumSmearing {
     # Resolution given in dpT/pT.
     # IDEAdet
     set ResolutionFormula {
-    (abs(eta) <= 0.9)                      * sqrt( 0.00034^2 * pt^2 + 0.00833^2) +
-	(abs(eta) > 0.9 && abs(eta) <= 2.1 )   * sqrt( 0.0034^2 * pt^2 + 0.0833^2)
+    (abs(eta) <= 0.87)                   * sqrt( 0.00034^2 * pt^2 + 0.00833^2) +
+    (abs(eta) > 0.87 && abs(eta) <= 2.1) * sqrt( 0.0034^2 * pt^2 + 0.0833^2)
     }
 }
 
@@ -209,7 +210,7 @@ module SimpleCalorimeter ECal {
 
     set pi [expr {acos(-1)}]
 
-    # lists of the edges of each tower in eta and phi
+    # Lists of the edges of each tower in eta and phi
     # each list starts with the lower edge of the first tower
     # the list ends with the higher edged of the last tower
 
@@ -218,30 +219,28 @@ module SimpleCalorimeter ECal {
     #ECAL cell sizes always 5.6x5.6 mm^2
 
     #barrel:                                                                    
-    #dphi = 0.2 degree towers up to eta <=1.2                                   
     set PhiBins {}
     for {set i -1402} {$i <= 1402} {incr i} {
         add PhiBins [expr {$i * $pi/1402.0 }]
     }
-    # 0.003 unit (5x5 mm^2) in eta up to eta <=1.2                              
+    #deta=0.00195 units for |eta| <= 0.87                                      
     for {set i -446} {$i <=446} {incr i} {
         set eta [expr {$i * 0.00195}]
         add EtaPhiBins $eta $PhiBins
     }
 
     #endcaps:                                                                   
-    #dphi = 0.8 degree towers for 1.2 < eta <=2.5                               
     set PhiBins {}
     for {set i -1402} {$i <= 1402} {incr i} {
         add PhiBins [expr {$i * $pi/1402.}]
     }
-    #deta=0.02 units for 1.2 < |eta| <=2.5                                      
-    #first, from -2.5 to -1.2, there will be (1.3/0.02=)65 segments             
+    #deta=0.004 units for 0.87 < |eta| <= 2.59                                      
+    #first, from -2.59 to -0.87             
     for {set i 1} {$i <=410} {incr i} {
         set eta [expr {-2.59 + $i * 0.004}]
         add EtaPhiBins $eta $PhiBins
     }
-    #same for 1.2 to 2.5                                                        
+    #same for 0.87 to 2.59                                                        
     for  {set i 1} {$i <=410} {incr i} {
         set eta [expr {0.87 + $i*0.004}]
         add EtaPhiBins $eta $PhiBins
@@ -294,7 +293,7 @@ module SimpleCalorimeter HCal {
 
     set pi [expr {acos(-1)}]
 
-    # lists of the edges of each tower in eta and phi
+    # Lists of the edges of each tower in eta and phi
     # each list starts with the lower edge of the first tower
     # the list ends with the higher edged of the last tower
 
@@ -303,30 +302,28 @@ module SimpleCalorimeter HCal {
     #HCAL cell sizes always 5.6x5.6 mm^2
 
     #barrel:                                                                    
-    #dphi = 0.2 degree towers up to eta <=1.2                                   
-    set PhiBins {}
+     set PhiBins {}
     for {set i -1402} {$i <= 1402} {incr i} {
         add PhiBins [expr {$i * $pi/1402.0 }]
     }
-    # 0.003 unit (5x5 mm^2) in eta up to eta <=1.2                              
+    #deta=0.00195 units for |eta| <= 0.87                                       
     for {set i -446} {$i <=446} {incr i} {
         set eta [expr {$i * 0.00195}]
         add EtaPhiBins $eta $PhiBins
     }
 
     #endcaps:                                                                   
-    #dphi = 0.8 degree towers for 1.2 < eta <=2.5                               
     set PhiBins {}
     for {set i -1402} {$i <= 1402} {incr i} {
         add PhiBins [expr {$i * $pi/1402.}]
     }
-    #deta=0.02 units for 1.2 < |eta| <=2.5                                      
-    #first, from -2.5 to -1.2, there will be (1.3/0.02=)65 segments             
+    #deta=0.004 units for 0.87 < |eta| <= 2.59                                      
+    #first, from -2.59 to -0.87             
     for {set i 1} {$i <=410} {incr i} {
         set eta [expr {-2.59 + $i * 0.004}]
         add EtaPhiBins $eta $PhiBins
     }
-    #same for 1.2 to 2.5                                                        
+    #same for 0.87 to 2.59                                                        
     for  {set i 1} {$i <=410} {incr i} {
         set eta [expr {0.87 + $i*0.004}]
         add EtaPhiBins $eta $PhiBins
@@ -356,7 +353,6 @@ module SimpleCalorimeter HCal {
     set ResolutionFormula {
     (abs(eta) <= 0.87 )                     * sqrt(energy^2*0.01^2 + energy*0.30^2)+
     (abs(eta) > 0.87 && abs(eta) <=2.59 )   * sqrt(energy^2*0.01^2 + energy*0.30^2)}
-    
 }
 
 ##############
@@ -433,8 +429,8 @@ module Efficiency PhotonEfficiency {
     set EfficiencyFormula {
 	(energy < 2.0 )                                        * (0.000)+
 	(energy >= 2.0) * (abs(eta) <= 0.87)                   * (0.99) +
-	(energy >= 2.0) * (abs(eta) >0.87 && abs(eta) <=2.59)  * (0.99)	+
-    (abs(eta) > 2.59 )                                     * (0.000)}
+	(energy >= 2.0) * (abs(eta) >0.87 && abs(eta) <= 2.59) * (0.99)	+
+        (abs(eta) > 2.59)                                      * (0.000)}
 }
 
 ##################
@@ -467,8 +463,8 @@ module Efficiency ElectronEfficiency {
     set EfficiencyFormula {
 	(energy < 2.0 )                                        * (0.000)+
 	(energy >= 2.0) * (abs(eta) <= 0.87)                   * (0.99) +
-	(energy >= 2.0) * (abs(eta) >0.87 && abs(eta) <=2.59)  * (0.99)	+
-    (abs(eta) > 2.59 )                                     * (0.000)}
+	(energy >= 2.0) * (abs(eta) >0.87 && abs(eta) <= 2.59) * (0.99)	+
+        (abs(eta) > 2.59)                                      * (0.000)}
 }
 
 ####################
@@ -504,8 +500,8 @@ module Efficiency MuonEfficiency {
     set EfficiencyFormula {
 	(energy < 2.0 )                                        * (0.000)+
 	(energy >= 2.0) * (abs(eta) <= 0.87)                   * (0.99) +
-	(energy >= 2.0) * (abs(eta) >0.87 && abs(eta) <=2.59)  * (0.99)	+
-    (abs(eta) > 2.59 )                                     * (0.000)}
+	(energy >= 2.0) * (abs(eta) >0.87 && abs(eta) <= 2.59) * (0.99)	+
+        (abs(eta) > 2.59)                                      * (0.000)}
 }
 
 ################
@@ -534,7 +530,6 @@ module Merger MissingET {
     add InputArray EFlowMerger/eflow
     set MomentumOutputArray momentum
 }
-
 
 ##################
 # Scalar HT merger
@@ -574,7 +569,6 @@ module PdgCodeFilter NeutrinoFilter {
     add PdgCode {-16}
 }
 
-
 #####################
 # MC truth jet finder
 #####################
@@ -600,7 +594,6 @@ module Merger GenMissingET {
     set MomentumOutputArray momentum
 }
 
-
 ############
 # Jet finder
 ############
@@ -621,14 +614,12 @@ module FastJetFinder FastJetFinderKt {
 # Jet finder VLC
 ################
 
-
 #source CLIC/CLICdet_JetReco.tcl
 
 
 ########################
 # Jet Flavor Association
 ########################
-
 
 module JetFlavorAssociation JetFlavorAssociation {
 
@@ -662,11 +653,9 @@ module BTagging BTagging {
   add EfficiencyFormula {5} {0.80}
 }
 
-
 #############
 # tau-tagging
 #############
-
 
 module TauTagging TauTagging {
   set ParticleInputArray Delphes/allParticles

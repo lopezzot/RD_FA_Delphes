@@ -1,0 +1,94 @@
+#################################################
+#                                               #
+#    IDEA Detector v1 - Card Description        #   
+#                                               #
+#################################################
+
+
+
+#################################################
+# B field description 
+# (Module: Particle Propagation)
+#################################################
+
+This module propagates charged and neutral particles from a given vertex centered in (0,0,0) to a cylinder 
+defined by its radius and its half-length (oriented along the z-axis).
+ 
+Radius of the magnetic field coverage: 2.25 m
+Half-length of the magnetic field coverage: 2.5 m
+Magnetic field: 2 T
+
+Ref: F. Bedeschi slides 
+
+
+#################################################
+# Tracker description 
+# (Modules: TrackingEfficiency, MomentumSmearing)
+#################################################
+
+At this level Delphes gives the possibility to treat in a different way ChargedHadrons, Electrons and Muons 
+which arrive from the Particle Propagation module.
+The efficiency of particles detection and the momentum resolution are related only to the Drift Chamber; 
+charged hadrons, electrons and muons are treated equally.
+
+# EFFICIENCY: 
+We introduce a dependence from the geometrical acceptance of the drift chamber (sensible until 260 mrad = 14°, 
+corresponding to eta=2.1) and from the energy of the particles (asking for a minimum pT for electrons and muons 
+to consent them to reach the chamber).
+In the acceptance region (eta < 2.1):
+E > 500 MeV        99.5%
+300 < E < 500 MeV  65%
+E < 300 MeV        6%
+
+# MOMENTUM RESOLUTION: 
+We introduce a different parametrization of the momentum resolution (as a function of the transverse momentum) 
+for the barrel (until eta <= 0.87) and the endcap (0.87 < eta <= 2.1) regions. 
+The parametrization is given by the formula: dpT/pT = sqrt (a^2 * pT^2 + b^2).
+Barrel:   dpT/pT = sqrt (0.00034^2 * pt^2 + 0.00833^2)
+Endcap:   dpT/pT = sqrt (0.0034^2 * pt^2 + 0.0833^2)
+
+Ref: G. Tassielli slides (CepC, Rome). We are waiting for a check with him.
+
+
+################################################
+# Dual-Readout Calorimeter description 
+# (Modules: ECAL, HCAL)
+################################################
+
+In order to implement the Dual-Readout calorimeter we choose to keep two different modules which have 
+an identical geometric description and differ in the input collections and the energy resolution formula.
+The geometry is given in Delphes as a segmentation of the cylinder in various cells (5.6 x 5.6 mm^2) in eta and phi directions, 
+different for barrel (eta < 0.87) and endcap (0.87 < eta < 2.59, because the calorimeter covers the region until 150 mrad).
+The resolution formula is given as a function of eta (barrel and encap) and energy: 
+sigma = sqrt (a^2 * E^2 + b^2 * E) 
+
+We give Electrons, Muons and Stable Particles (from the Particle Propagator module) as input collections to ECAL, 
+while Charged Hadrons and Stable Particles to HCAL. 
+Electrons, photons and pi0 represent the electromagnetic component: all their energy is deposited in “ECAL”. 
+K0(short) and Lambda deposit 100% of their energy in ECAL (HCAL) with a probability of 30% (70%): 
+in fact they have 30% of probability to decay in two pions and then photons. 
+The rest of particles deposit their energy in “HCAL”.
+ECAL:  sigma = sqrt (0.02^2 * E^2 + 0.11^2 * E) 
+HCAL: sigma = sqrt (0.01^2 * E^2 + 0.3^2 * E)
+
+At the end of the Calorimeter Module, we merge the output (kept separately to simulate the DR Calo) in an unique one, 
+using the Module Track Merger.
+
+Ref: L. Pezzotti, M. Antonello
+
+
+################################################
+# Efficiency reconstruction and Isolation
+################################################
+
+We describe in a similar way Photons, Electrons and Muons: a minimum pT of 0.5 GeV and a PTRatioMax of 0.12 (0.25) 
+for Photons/Electrons (Muons); a minimum energy of 2 GeV; an efficiency of 99% equal for barrel and endcap.
+
+
+################################################
+# Jet Reconstruction, Jet Flavour Association, 
+# BTagging, TauTagging
+################################################
+
+It is needed to understand which types of algorithms we want to use.
+We insert the simplest form in each module only in order to avoid external sources. 
