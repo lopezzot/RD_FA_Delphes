@@ -22,10 +22,12 @@ set ExecutionPath {
     ElectronMomentumSmearing
     MuonMomentumSmearing
     
+    TrackMerger
+
     ECal
     HCal
     
-    TrackMerger
+    EFlowTrackMerger
 
     Calorimeter
     EFlowMerger
@@ -97,7 +99,7 @@ module Efficiency ChargedHadronTrackingEfficiency {
 	(abs(eta) > 2.1)                                       * (0.000) +
 	(energy >= 0.5) * (abs(eta) <= 2.1)                    * (0.995) +
 	(energy < 0.5 && energy >= 0.3) * (abs(eta) <= 2.1)    * (0.65) +
-	(energy < 0.3) * (abs(eta) <= 2.1 )                    * (0.06) 
+	(energy < 0.3) * (abs(eta) <= 2.1)                     * (0.06) 
     }
 }
 
@@ -116,7 +118,7 @@ module Efficiency ElectronTrackingEfficiency {
 	(abs(eta) > 2.1)                                       * (0.000) +
 	(energy >= 0.5) * (abs(eta) <= 2.1)                    * (0.995) +
 	(energy < 0.5 && energy >= 0.3) * (abs(eta) <= 2.1)    * (0.65) +
-	(energy < 0.3) * (abs(eta) <= 2.1 )                    * (0.06) 
+	(energy < 0.3) * (abs(eta) <= 2.1)                     * (0.06) 
     }
 }
 
@@ -134,7 +136,7 @@ module Efficiency MuonTrackingEfficiency {
 	(abs(eta) > 2.1)                                       * (0.000) +
 	(energy >= 0.5) * (abs(eta) <= 2.1)                    * (0.995) +
 	(energy < 0.5 && energy >= 0.3) * (abs(eta) <= 2.1)    * (0.65) +
-	(energy < 0.3) * (abs(eta) <= 2.1 )                    * (0.06) 
+	(energy < 0.3) * (abs(eta) <= 2.1)                     * (0.06) 
     }
 }
 
@@ -187,15 +189,26 @@ module MomentumSmearing MuonMomentumSmearing {
     }
 }
 
+##############
+# Track merger
+##############
+
+module Merger TrackMerger {
+    # add InputArray InputArray
+    add InputArray ElectronMomentumSmearing/electrons
+    add InputArray MuonMomentumSmearing/muons
+    set OutputArray tracks
+}
+
+
 #############
 #   DRECAL
 #############
 
 module SimpleCalorimeter ECal {
     set ParticleInputArray ParticlePropagator/stableParticles
-    #We change the input using only electrons
-    set TrackInputArray ElectronMomentumSmearing/electrons
-    set TrackInputArray MuonMomentumSmearing/muons
+    # We change the input excluding chargedHadrons
+    set TrackInputArray TrackMerger/tracks
 
     set TowerOutputArray ecalTowers
     set EFlowTrackOutputArray DREeflowTracks
@@ -269,7 +282,7 @@ module SimpleCalorimeter ECal {
     # set ECalResolutionFormula {resolution formula as a function of eta and energy}
     set ResolutionFormula {
     (abs(eta) <= 0.87 )                     * sqrt(energy^2*0.02^2 + energy*0.11^2)+
-    (abs(eta) > 0.87 && abs(eta) <=2.59 )   * sqrt(energy^2*0.02^2 + energy*0.11^2)}
+    (abs(eta) > 0.87 && abs(eta) <=2.59)    * sqrt(energy^2*0.02^2 + energy*0.11^2)}
 }    
 
 #############
@@ -352,26 +365,27 @@ module SimpleCalorimeter HCal {
     # set HCalResolutionFormula {resolution formula as a function of eta and energy}
     set ResolutionFormula {
     (abs(eta) <= 0.87 )                     * sqrt(energy^2*0.01^2 + energy*0.30^2)+
-    (abs(eta) > 0.87 && abs(eta) <=2.59 )   * sqrt(energy^2*0.01^2 + energy*0.30^2)}
+    (abs(eta) > 0.87 && abs(eta) <=2.59)    * sqrt(energy^2*0.01^2 + energy*0.30^2)}
 }
 
 ##############
 # Track merger
 ##############
 
-module Merger TrackMerger {
+module Merger EFlowTrackMerger {
     # add InputArray InputArray
     add InputArray ECal/DREeflowTracks
     add InputArray HCal/DRHeflowTracks
     set OutputArray eflowTracks
 }
 
+
 #################
 # Electron filter
 #################
 
 module PdgCodeFilter ElectronFilter {
-    set InputArray TrackMerger/eflowTracks
+    set InputArray EFlowTrackMerger/eflowTracks
     set OutputArray electrons
     set Invert true
     add PdgCode {11}
@@ -383,7 +397,7 @@ module PdgCodeFilter ElectronFilter {
 ######################
 
 module PdgCodeFilter ChargedHadronFilter {
-    set InputArray TrackMerger/eflowTracks
+    set InputArray EFlowTrackMerger/eflowTracks
     set OutputArray chargedHadrons
     
     add PdgCode {11}
@@ -409,7 +423,7 @@ module Merger Calorimeter {
 
 module Merger EFlowMerger {
     # add InputArray InputArray
-    add InputArray TrackMerger/eflowTracks
+    add InputArray EFlowTrackMerger/eflowTracks
     add InputArray ECal/eflowPhotons
     add InputArray HCal/eflowNeutralHadrons
     set OutputArray eflow
@@ -539,10 +553,13 @@ module Merger ScalarHT {
     # add InputArray InputArray
     add InputArray EFlowMerger/eflow
     set EnergyOutputArray energy
+
 }
+
 ##################################
 # EFlowFilter (UniqueObjectFinder)
 ##################################
+
 module UniqueObjectFinder EFlowFilter {
     add InputArray PhotonIsolation/photons photons
     add InputArray ElectronIsolation/electrons electrons
@@ -684,17 +701,21 @@ module TauTagging TauTagging {
 module TreeWriter TreeWriter {
     # add Branch InputArray BranchName BranchClass
     add Branch Delphes/allParticles Particle GenParticle
-    
-    add Branch GenJetFinder/jets GenJet Jet
 
+    add Branch GenJetFinder/jets GenJet Jet
     add Branch FastJetFinderKt/KTjets KTjet Jet
     
-    ####
+    add Branch ElectronTrackingEfficiency/electrons Electron1 Electron
+    add Branch ElectronMomentumSmearing/electrons Electron2 Electron
+    add Branch ElectronFilter/electrons Electron3 Electron
+    add Branch ElectronEfficiency/electrons Electron4 Electron
+    add Branch ElectronIsolation/electrons Electron5 Electron
 
+    ####
     add Branch GenMissingET/momentum GenMissingET MissingET
     add Branch Calorimeter/towers Tower Tower
 
-    add Branch TrackMerger/eflowTracks EFlowTrack Track
+    add Branch EFlowTrackMerger/eflowTracks EFlowTrack Track
     add Branch ECal/eflowPhotons EFlowPhoton Tower
     add Branch HCal/eflowNeutralHadrons EFlowNeutralHadron Tower
     
