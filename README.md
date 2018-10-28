@@ -1,5 +1,5 @@
 # RD_FA_Delphes
-Delphes IDEA simulation
+Delphes IDEA simulation.
 
 Implementation of the IDEA Detector with Delphes.   
 Working folders and files:  
