@@ -705,12 +705,6 @@ module TreeWriter TreeWriter {
     add Branch GenJetFinder/jets GenJet Jet
     add Branch FastJetFinderKt/KTjets KTjet Jet
     
-    add Branch ElectronTrackingEfficiency/electrons Electron1 Electron
-    add Branch ElectronMomentumSmearing/electrons Electron2 Electron
-    add Branch ElectronFilter/electrons Electron3 Electron
-    add Branch ElectronEfficiency/electrons Electron4 Electron
-    add Branch ElectronIsolation/electrons Electron5 Electron
-
     ####
     add Branch GenMissingET/momentum GenMissingET MissingET
     add Branch Calorimeter/towers Tower Tower
