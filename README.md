@@ -10,10 +10,14 @@ Working folders and files:
 To generate events with DelphesPythia8 run in Delphes-3.4.1:  
         ./DelphesPythia8 cards/delphes_card_IDEAdet.tcl examples/Pythia8/mypythia/MYCONFIG.cmnd MYNEWOUTPUT.root . 
         
-To analyize data with Pyroot in Delphes-3.4.1:  
+To analyze data with Pyroot in Delphes-3.4.1:  
         python examples/myanalysis/MYANALYSIS.py MYNEWOUTPUT.root MYANALYSYSOUTPUT.root . 
-        
-  
+
+To analyze data with a ROOT macro in Delphes-3.4.1, open a root session: 
+        .L RootMacro.C
+        RootMacro t
+        t.Loop("CorrectPath/inputFile.root")
+      
   
 TO INSTALL DELPHES AND CONFIGURE WITH PYTHIA8:  
 

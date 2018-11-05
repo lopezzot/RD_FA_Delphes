@@ -200,7 +200,6 @@ module Merger TrackMerger {
     set OutputArray tracks
 }
 
-
 #############
 #   DRECAL
 #############
@@ -368,9 +367,9 @@ module SimpleCalorimeter HCal {
     (abs(eta) > 0.87 && abs(eta) <=2.59)    * sqrt(energy^2*0.01^2 + energy*0.30^2)}
 }
 
-##############
-# Track merger
-##############
+###################
+# EFlowTrack merger
+###################
 
 module Merger EFlowTrackMerger {
     # add InputArray InputArray
@@ -378,7 +377,6 @@ module Merger EFlowTrackMerger {
     add InputArray HCal/DRHeflowTracks
     set OutputArray eflowTracks
 }
-
 
 #################
 # Electron filter
@@ -441,7 +439,7 @@ module Efficiency PhotonEfficiency {
 
     # efficiency formula for photons
     set EfficiencyFormula {
-	(energy < 2.0 )                                        * (0.000)+
+	(energy < 2.0)                                         * (0.000)+
 	(energy >= 2.0) * (abs(eta) <= 0.87)                   * (0.99) +
 	(energy >= 2.0) * (abs(eta) >0.87 && abs(eta) <= 2.59) * (0.99)	+
         (abs(eta) > 2.59)                                      * (0.000)}
@@ -475,7 +473,7 @@ module Efficiency ElectronEfficiency {
     # set EfficiencyFormula {efficiency formula as a function of eta and pt}
 
     set EfficiencyFormula {
-	(energy < 2.0 )                                        * (0.000)+
+	(energy < 2.0)                                         * (0.000)+
 	(energy >= 2.0) * (abs(eta) <= 0.87)                   * (0.99) +
 	(energy >= 2.0) * (abs(eta) >0.87 && abs(eta) <= 2.59) * (0.99)	+
         (abs(eta) > 2.59)                                      * (0.000)}
@@ -512,7 +510,7 @@ module Efficiency MuonEfficiency {
     # current full simulation of CLICdet yields:
 
     set EfficiencyFormula {
-	(energy < 2.0 )                                        * (0.000)+
+	(energy < 2.0)                                         * (0.000)+
 	(energy >= 2.0) * (abs(eta) <= 0.87)                   * (0.99) +
 	(energy >= 2.0) * (abs(eta) >0.87 && abs(eta) <= 2.59) * (0.99)	+
         (abs(eta) > 2.59)                                      * (0.000)}
@@ -700,22 +698,33 @@ module TauTagging TauTagging {
 
 module TreeWriter TreeWriter {
     # add Branch InputArray BranchName BranchClass
-    add Branch Delphes/allParticles Particle GenParticle
 
-    add Branch GenJetFinder/jets GenJet Jet
-    add Branch FastJetFinderKt/KTjets KTjet Jet
+    add Branch Delphes/allParticles Particle GenParticle
     
-    ####
+    ##### We save electrons and muons collection at various livels of the card flow
+    add Branch ParticlePropagator/electrons Electron1 Electron
+    add Branch ElectronMomentumSmearing/electrons Electron2 Electron
+    add Branch ElectronFilter/electrons Electron3 Electron
+    add Branch ElectronIsolation/electrons Electron4 Electron
+
+    add Branch ParticlePropagator/muons Muon1 Muon
+    add Branch MuonMomentumSmearing/muons Muon2 Muon
+    add Branch MuonIsolation/muons Muon3 Muon
+
+    ##### Final Collections 
+    add Branch EFlowFilter/photons Photon Photon
+    add Branch EFlowFilter/electrons Electron Electron
+    add Branch EFlowFilter/muons Muon Muon
+    
     add Branch GenMissingET/momentum GenMissingET MissingET
     add Branch Calorimeter/towers Tower Tower
 
     add Branch EFlowTrackMerger/eflowTracks EFlowTrack Track
     add Branch ECal/eflowPhotons EFlowPhoton Tower
     add Branch HCal/eflowNeutralHadrons EFlowNeutralHadron Tower
-    
-    add Branch EFlowFilter/photons Photon Photon
-    add Branch EFlowFilter/electrons Electron Electron
-    add Branch EFlowFilter/muons Muon Muon
+
+    add Branch GenJetFinder/jets GenJet Jet
+    add Branch FastJetFinderKt/KTjets KTjet Jet
     
     add Branch MissingET/momentum MissingET MissingET
     add Branch ScalarHT/energy ScalarHT ScalarHT

@@ -62,8 +62,15 @@ different for barrel (eta < 0.87) and endcap (0.87 < eta < 2.59, because the cal
 The resolution formula is given as a function of eta (barrel and encap) and energy: 
 sigma = sqrt (a^2 * E^2 + b^2 * E) 
 
-We give Electrons, Muons and Stable Particles (from the Particle Propagator module) as input collections to ECAL, 
-while Charged Hadrons and Stable Particles to HCAL. 
+On one hand, we give Electrons, Muons and Stable Particles (from the Particle Propagator module) as input collections to ECAL,
+merging before electrons and muons in a single TrackInputArray called tracks:
+   set ParticleInputArray ParticlePropagator/stableParticles
+   set TrackInputArray TrackMerger/tracks
+	   	  
+On the other hand, we give Charged Hadrons and Stable Particles as input collections to HCAL:
+    set ParticleInputArray ParticlePropagator/stableParticles
+    set TrackInputArray ChargedHadronMomentumSmearing/chargedHadrons
+
 Electrons, photons and pi0 represent the electromagnetic component: all their energy is deposited in “ECAL”. 
 K0(short) and Lambda deposit 100% of their energy in ECAL (HCAL) with a probability of 30% (70%): 
 in fact they have 30% of probability to decay in two pions and then photons. 
@@ -72,7 +79,7 @@ ECAL:  sigma = sqrt (0.02^2 * E^2 + 0.11^2 * E)
 HCAL: sigma = sqrt (0.01^2 * E^2 + 0.3^2 * E)
 
 At the end of the Calorimeter Module, we merge the output (kept separately to simulate the DR Calo) in an unique one, 
-using the Module Track Merger.
+using the Module EFlowTrackMerger.
 
 Ref: L. Pezzotti, M. Antonello
 
@@ -92,3 +99,20 @@ for Photons/Electrons (Muons); a minimum energy of 2 GeV; an efficiency of 99% e
 
 It is needed to understand which types of algorithms we want to use.
 We insert the simplest form in each module only in order to avoid external sources. 
+
+
+################################################
+# TreeWriter
+################################################
+
+In the TreeWriter we save electrons and muons collection at different levels of the datacard flow,
+in order to study the impact of the reconstruction efficiency for each step:
+
+Electron1 = electrons from ParticlePropagator
+Electron2 = electrons exiting from the Drift Chamber (Tracking Efficiency and Momentum Smearing)
+Electron3 = electrons exiting from the calorimeter
+Electron4 = electrons after final efficiency and isolation criteria
+
+Muon1     = muons from ParticlePropagator 
+Muon2     = muons exiting from the Drift Chamber (Tracking Efficiency and Momentum Smearing)
+Muon3     = muons after final efficiency and isolation criteria
