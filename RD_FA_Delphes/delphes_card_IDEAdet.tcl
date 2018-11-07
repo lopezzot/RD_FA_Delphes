@@ -152,8 +152,8 @@ module MomentumSmearing ChargedHadronMomentumSmearing {
     # Resolution given in dpT/pT.
     # IDEAdet
     set ResolutionFormula {
-    (abs(eta) <= 0.87)                   * sqrt(0.00034^2 * pt^2 + 0.00833^2) +
-    (abs(eta) > 0.87 && abs(eta) <= 2.1) * sqrt(0.0034^2 * pt^2 + 0.0833^2)
+    (abs(eta) <= 0.87) * (pt > 0.1)                   * sqrt(0.000034^2 * pt^2 + 0.00133^2) +
+    (abs(eta) > 0.87 && abs(eta) <= 2.1) * (pt > 0.1) * sqrt(0.00034^2 * pt^2 + 0.0133^2)
     }
 }
 
@@ -168,8 +168,8 @@ module MomentumSmearing ElectronMomentumSmearing {
     # Resolution given in dpT/pT.
     # IDEAdet
     set ResolutionFormula {
-    (abs(eta) <= 0.87)                   * sqrt( 0.00034^2 * pt^2 + 0.00833^2) +
-    (abs(eta) > 0.87 && abs(eta) <= 2.1) * sqrt( 0.0034^2 * pt^2 + 0.0833^2)
+    (abs(eta) <= 0.87) * (pt > 0.1)                   * sqrt( 0.000034^2 * pt^2 + 0.00133^2) +
+    (abs(eta) > 0.87 && abs(eta) <= 2.1) * (pt > 0.1) * sqrt( 0.00034^2 * pt^2 + 0.0133^2)
     }
 }
 
@@ -184,8 +184,8 @@ module MomentumSmearing MuonMomentumSmearing {
     # Resolution given in dpT/pT.
     # IDEAdet
     set ResolutionFormula {
-    (abs(eta) <= 0.87)                   * sqrt( 0.00034^2 * pt^2 + 0.00833^2) +
-    (abs(eta) > 0.87 && abs(eta) <= 2.1) * sqrt( 0.0034^2 * pt^2 + 0.0833^2)
+    (abs(eta) <= 0.87) * (pt > 0.1)                   * sqrt( 0.000034^2 * pt^2 + 0.00133^2) +
+    (abs(eta) > 0.87 && abs(eta) <= 2.1) * (pt > 0.1) * sqrt( 0.00034^2 * pt^2 + 0.0133^2)
     }
 }
 
