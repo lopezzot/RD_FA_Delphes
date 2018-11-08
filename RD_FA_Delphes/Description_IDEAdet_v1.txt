@@ -44,8 +44,8 @@ E < 300 MeV        6%
 We introduce a different parametrization of the momentum resolution (as a function of the transverse momentum) 
 for the barrel (until eta <= 0.87) and the endcap (0.87 < eta <= 2.1) regions. 
 The parametrization is given by the formula: dpT/pT = sqrt (a^2 * pT^2 + b^2).
-Barrel:   dpT/pT = sqrt (0.00034^2 * pt^2 + 0.00833^2)
-Endcap:   dpT/pT = sqrt (0.0034^2 * pt^2 + 0.0833^2)
+Barrel:   dpT/pT = sqrt (0.000034^2 * pt^2 + 0.00133^2)
+Endcap:   dpT/pT = sqrt (0.00034^2 * pt^2 + 0.0133^2)
 
 Ref: G. Tassielli slides (CepC, Rome). We are waiting for a check with him.
 
@@ -75,7 +75,7 @@ Electrons, photons and pi0 represent the electromagnetic component: all their en
 K0(short) and Lambda deposit 100% of their energy in ECAL (HCAL) with a probability of 30% (70%): 
 in fact they have 30% of probability to decay in two pions and then photons. 
 The rest of particles deposit their energy in “HCAL”.
-ECAL:  sigma = sqrt (0.02^2 * E^2 + 0.11^2 * E) 
+ECAL: sigma = sqrt (0.02^2 * E^2 + 0.11^2 * E) 
 HCAL: sigma = sqrt (0.01^2 * E^2 + 0.3^2 * E)
 
 At the end of the Calorimeter Module, we merge the output (kept separately to simulate the DR Calo) in an unique one, 
