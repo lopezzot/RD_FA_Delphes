@@ -47,15 +47,17 @@ set ExecutionPath {
     EFlowFilter
     NeutrinoFilter
     GenJetFinder
-    FastJetFinderKt
+    FastJetFinderAntiKt
     
     MissingET
     GenMissingET
 
+    JetEnergyScale
+
     JetFlavorAssociation
     
     BTagging
-	
+    CTagging	
     TauTagging
     
     ScalarHT
@@ -280,8 +282,8 @@ module SimpleCalorimeter ECal {
 
     # set ECalResolutionFormula {resolution formula as a function of eta and energy}
     set ResolutionFormula {
-    (abs(eta) <= 0.87 )                     * sqrt(energy^2*0.02^2 + energy*0.11^2)+
-    (abs(eta) > 0.87 && abs(eta) <=2.59)    * sqrt(energy^2*0.02^2 + energy*0.11^2)}
+    (abs(eta) <= 0.87 )                     * sqrt(energy^2*0.07^2 + energy*0.55^2)+
+    (abs(eta) > 0.87 && abs(eta) <=2.59)    * sqrt(energy^2*0.07^2 + energy*0.55^2)}
 }    
 
 #############
@@ -594,7 +596,7 @@ module FastJetFinder GenJetFinder {
     set OutputArray jets
 
     # algorithm: 1 CDFJetClu, 2 MidPoint, 3 SIScone, 4 kt, 5 Cambridge/Aachen, 6 antikt, 7 anti-kt with winner-take-all axis (for N-subjettiness), 8 N-jettiness, 9 Valencia
-    set JetAlgorithm 9
+    set JetAlgorithm 6
     set ParameterR 0.5
     set JetPTMin 20.0
 }
@@ -613,24 +615,29 @@ module Merger GenMissingET {
 # Jet finder
 ############
 
-module FastJetFinder FastJetFinderKt {
+module FastJetFinder FastJetFinderAntiKt {
     #  set InputArray Calorimeter/towers
     set InputArray EFlowMerger/eflow
 
-    set OutputArray KTjets
+    set OutputArray jets
 
     # algorithm: 1 CDFJetClu, 2 MidPoint, 3 SIScone, 4 kt, 5 Cambridge/Aachen, 6 antikt, 7 anti-kt with winner-take-all axis (for N-subjettiness), 8 N-jettiness, 9 Valencia
-    set JetAlgorithm 4
+    set JetAlgorithm 6
     set ParameterR 0.5
     set JetPTMin 20.0
 }
 
-################
-# Jet finder VLC
-################
+##################                                                                                                                        
+# Jet Energy Scale                                                                                                                            
+##################                                                                                                              
 
-#source CLIC/CLICdet_JetReco.tcl
-
+module EnergyScale JetEnergyScale {
+    set InputArray FastJetFinderAntiKt/jets
+    set OutputArray jets
+    
+    # scale formula for jets                                                                                                    
+    set ScaleFormula {1.08}
+}
 
 ########################
 # Jet Flavor Association
@@ -641,12 +648,11 @@ module JetFlavorAssociation JetFlavorAssociation {
   set PartonInputArray Delphes/partons
   set ParticleInputArray Delphes/allParticles
   set ParticleLHEFInputArray Delphes/allParticlesLHEF
-  set JetInputArray FastJetFinderKt/KTjets
+  set JetInputArray JetEnergyScale/jets
 
   set DeltaR 0.5
   set PartonPTMin 1.0
   set PartonEtaMax 3.0
-
 }
 
 ###########
@@ -654,18 +660,35 @@ module JetFlavorAssociation JetFlavorAssociation {
 ###########
 
 module BTagging BTagging {
-  set JetInputArray FastJetFinderKt/KTjets
+    set JetInputArray JetEnergyScale/jets
+    set BitNumber 0
+ 
+    # default efficiency formula (misidentification rate)
+    add EfficiencyFormula {0} {0.001}
+    
+    # efficiency formula for c-jets (misidentification rate)
+    add EfficiencyFormula {4} {0.10}
+    
+    # efficiency formula for b-jets
+    add EfficiencyFormula {5} {0.80}
+}
 
-  set BitNumber 0
-  
-  # default efficiency formula (misidentification rate)
-  add EfficiencyFormula {0} {0.001}
+###########                                                                                                                                
+# c-tagging                                                                                                                                        
+###########                                                                                                                         
 
-  # efficiency formula for c-jets (misidentification rate)
-  add EfficiencyFormula {4} {0.10}
+module BTagging CTagging {
+    set JetInputArray JetEnergyScale/jets
+    set BitNumber 1
 
-  # efficiency formula for b-jets
-  add EfficiencyFormula {5} {0.80}
+    # default efficiency formula (misidentification rate)                                                                       
+    add EfficiencyFormula {0} {0.12}
+    
+    # efficiency formula for c-jets (misidentification rate)                                                                                 
+    add EfficiencyFormula {4} {0.70}
+
+    # efficiency formula for b-jets                                                                                               
+    add EfficiencyFormula {5} {0.20}
 }
 
 #############
@@ -675,20 +698,16 @@ module BTagging BTagging {
 module TauTagging TauTagging {
   set ParticleInputArray Delphes/allParticles
   set PartonInputArray Delphes/partons
-  set JetInputArray FastJetFinderKt/KTjets
+  set JetInputArray JetEnergyScale/jets
 
   set DeltaR 0.5
-
   set TauPTMin 1.0
-
   set TauEtaMax 3.0
-
-  # add EfficiencyFormula {abs(PDG code)} {efficiency formula as a function of eta and pt}
 
   # default efficiency formula (misidentification rate)
   add EfficiencyFormula {0} {0.001}
   # efficiency formula for tau-jets
-  add EfficiencyFormula {15} {0.4}
+  add EfficiencyFormula {15} {0.6}
 }
 
 
@@ -724,7 +743,7 @@ module TreeWriter TreeWriter {
     add Branch HCal/eflowNeutralHadrons EFlowNeutralHadron Tower
 
     add Branch GenJetFinder/jets GenJet Jet
-    add Branch FastJetFinderKt/KTjets KTjet Jet
+    add Branch JetEnergyScale/jets AntiKtJet Jet
     
     add Branch MissingET/momentum MissingET MissingET
     add Branch ScalarHT/energy ScalarHT ScalarHT
